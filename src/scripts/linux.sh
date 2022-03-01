@@ -18,7 +18,7 @@ self_hosted_helper() {
 # Function to install a package
 install_packages() {
   packages=("$@")
-  $apt_install "${packages[@]}" >/dev/null 2>&1 || (update_lists && $apt_install "${packages[@]}" >/dev/null 2>&1)
+  $apt_install "${packages[@]}"  || (update_lists && $apt_install "${packages[@]}" )
 }
 
 # Function to disable an extension.
@@ -30,9 +30,9 @@ disable_extension_helper() {
     disable_extension_dependents "$extension"
   fi
   sudo sed -Ei "/=(.*\/)?\"?$extension(.so)?$/d" "${ini_file[@]}" "$pecl_file"
-  sudo find "$ini_dir"/.. -name "*$extension.ini" -not -path "*phar.ini" -not -path "*pecl.ini" -not -path "*mods-available*" -delete >/dev/null 2>&1 || true
+  sudo find "$ini_dir"/.. -name "*$extension.ini" -not -path "*phar.ini" -not -path "*pecl.ini" -not -path "*mods-available*" -delete  || true
   mkdir -p /tmp/extdisabled/"$version"
-  echo '' | sudo tee /tmp/extdisabled/"$version"/"$extension" >/dev/null 2>&1
+  echo '' | sudo tee /tmp/extdisabled/"$version"/"$extension" 
 }
 
 # Function to add PDO extension.
@@ -45,7 +45,7 @@ add_pdo_extension() {
     ext_name=$1
     if shared_extension pdo; then
       disable_extension_helper pdo
-      echo "extension=pdo.so" | sudo tee "${ini_file[@]/php.ini/conf.d/10-pdo.ini}" >/dev/null 2>&1
+      echo "extension=pdo.so" | sudo tee "${ini_file[@]/php.ini/conf.d/10-pdo.ini}" 
     fi
     if [ "$ext" = "mysql" ]; then
       enable_extension "mysqlnd" "extension"
@@ -53,15 +53,15 @@ add_pdo_extension() {
     elif [ "$ext" = "dblib" ]; then
       ext_name="sybase"
     elif [ "$ext" = "firebird" ]; then
-      install_packages libfbclient2 >/dev/null 2>&1
+      install_packages libfbclient2 
       enable_extension "pdo_firebird" "extension"
       ext_name="interbase"
     elif [ "$ext" = "sqlite" ]; then
       ext="sqlite3"
       ext_name="sqlite3"
     fi
-    add_extension "$ext_name" "extension" >/dev/null 2>&1
-    add_extension "$pdo_ext" "extension" >/dev/null 2>&1
+    add_extension "$ext_name" "extension" 
+    add_extension "$pdo_ext" "extension" 
     add_extension_log "$pdo_ext" "Enabled"
   fi
 }
@@ -75,7 +75,7 @@ check_package() {
 add_extension_helper() {
   local extension=$1
   package=php"$version"-"$extension"
-  add_ppa ondrej/php >/dev/null 2>&1 || update_ppa ondrej/php
+  add_ppa ondrej/php  || update_ppa ondrej/php
   (check_package "$package" && install_packages "$package") || pecl_install "$extension"
   add_extension_log "$extension" "Installed and enabled"
   sudo chmod 777 "${ini_file[@]}"
@@ -87,7 +87,7 @@ add_devtools() {
   if ! command -v "$tool$version" >/dev/null; then
     install_packages "php$version-dev"
   fi
-  add_extension xml extension >/dev/null 2>&1
+  add_extension xml extension 
   switch_version "phpize" "php-config"
   add_log "${tick:?}" "$tool" "Added $tool $semver"
 }
@@ -104,11 +104,11 @@ setup_old_versions() {
 
 # Function to add PECL.
 add_pecl() {
-  add_devtools phpize >/dev/null 2>&1
+  add_devtools phpize 
   if ! command -v pecl >/dev/null; then
     install_packages php-pear
   fi
-  configure_pecl >/dev/null 2>&1
+  configure_pecl 
   pear_version=$(get_tool_version "pecl" "version")
   add_log "${tick:?}" "PECL" "Added PECL $pear_version"
 }
@@ -129,7 +129,7 @@ switch_version() {
 # Function to install packaged PHP
 add_packaged_php() {
   if [ "$runner" = "self-hosted" ] || [ "${use_package_cache:-true}" = "false" ]; then
-    add_ppa ondrej/php >/dev/null 2>&1 || update_ppa ondrej/php
+    add_ppa ondrej/php  || update_ppa ondrej/php
     IFS=' ' read -r -a packages <<<"$(sed "s/[^ ]*/php$version-&/g" "$src"/configs/php_packages | tr '\n' ' ')"
     install_packages "${packages[@]}"
     add_pecl
@@ -158,14 +158,14 @@ add_php() {
     setup_old_versions
   else
     add_packaged_php
-    switch_version >/dev/null 2>&1
+    switch_version 
   fi
   status="Installed"
 }
 
 # Function to ini file for pear and link it to each SAPI.
 link_pecl_file() {
-  echo '' | sudo tee "$pecl_file" >/dev/null 2>&1
+  echo '' | sudo tee "$pecl_file" 
   for file in "${ini_file[@]}"; do
     sapi_scan_dir="$(realpath -m "$(dirname "$file")")/conf.d"
     [ "$sapi_scan_dir" != "$scan_dir" ] && ! [ -h "$sapi_scan_dir" ] && sudo ln -sf "$pecl_file" "$sapi_scan_dir/99-pecl.ini"
@@ -195,9 +195,9 @@ add_php_config() {
   elif [ "$ini" = "development" ]; then
     echo "${ini_file[@]}" | xargs -n 1 -P 6 sudo cp "$php_lib_dir"/php.ini-development
   elif [ "$ini" = "none" ]; then
-    echo '' | sudo tee "${ini_file[@]}" >/dev/null 2>&1
+    echo '' | sudo tee "${ini_file[@]}" 
   fi
-  echo "$ini" | sudo tee "$current_ini" >/dev/null 2>&1
+  echo "$ini" | sudo tee "$current_ini" 
 }
 
 # Function to Setup PHP
@@ -207,13 +207,13 @@ setup_php() {
   php_config="$(command -v php-config)"
   if [[ -z "$php_config" ]] || [ "$(php_semver | cut -c 1-3)" != "$version" ]; then
     if [ ! -e "/usr/bin/php$version" ]; then
-      add_php >/dev/null 2>&1
+      add_php 
     else
       if ! [[ "$version" =~ ${old_versions:?} ]]; then
-        switch_version >/dev/null 2>&1
+        switch_version 
       fi
       if [ "${update:?}" = "true" ]; then
-        update_php >/dev/null 2>&1
+        update_php 
       else
         status="Switched to"
       fi
@@ -221,7 +221,7 @@ setup_php() {
     php_config="$(command -v php-config)"
   else
     if [ "$update" = "true" ]; then
-      update_php >/dev/null 2>&1
+      update_php 
     else
       status="Found"
     fi
@@ -241,7 +241,7 @@ setup_php() {
   link_pecl_file
   configure_php
   set_output "php-version" "$semver"
-  sudo rm -rf /usr/local/bin/phpunit >/dev/null 2>&1
+  sudo rm -rf /usr/local/bin/phpunit 
   sudo chmod 777 "${ini_file[@]}" "$pecl_file" "${tool_path_dir:?}"
   sudo cp "$src"/configs/pm/*.json "$RUNNER_TOOL_CACHE/"
   add_log "${tick:?}" "PHP" "$status PHP $semver$extra_version"
@@ -255,7 +255,7 @@ debconf_fix="DEBIAN_FRONTEND=noninteractive"
 apt_install="sudo $debconf_fix apt-fast install -y --no-install-recommends"
 scripts="$src"/scripts
 
-add_sudo >/dev/null 2>&1
+add_sudo 
 
 . /etc/os-release
 # shellcheck source=.

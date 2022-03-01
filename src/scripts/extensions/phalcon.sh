@@ -6,7 +6,7 @@ add_phalcon_helper() {
   else
     packages=("php${version:?}-$extension")
     [ "$extension" = "phalcon4" ] && packages+=("php${version:?}-psr")
-    add_ppa ondrej/php >/dev/null 2>&1 || update_ppa ondrej/php
+    add_ppa ondrej/php  || update_ppa ondrej/php
     check_package "${packages[0]}" && install_packages "${packages[@]}"
   fi
 }
@@ -50,9 +50,9 @@ add_phalcon() {
   status='Enabled'
   extension_major_version=${extension: -1}
   if [ "$extension_major_version" = "4" ]; then
-    add_phalcon4 >/dev/null 2>&1
+    add_phalcon4 
   elif [ "$extension_major_version" = "3" ]; then
-    add_phalcon3 >/dev/null 2>&1
+    add_phalcon3 
   fi
   add_extension_log "phalcon" "$status"
 }

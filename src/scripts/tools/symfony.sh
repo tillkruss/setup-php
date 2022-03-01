@@ -1,11 +1,11 @@
 add_symfony() {
   if [ "$(uname -s)" = "Linux" ]; then
-    echo 'deb [trusted=yes] https://repo.symfony.com/apt/ /' | sudo tee /etc/apt/sources.list.d/symfony-cli.list >/dev/null 2>&1
+    echo 'deb [trusted=yes] https://repo.symfony.com/apt/ /' | sudo tee /etc/apt/sources.list.d/symfony-cli.list 
     update_lists symfony repo.symfony.com
     install_packages symfony-cli
   elif [ "$(uname -s)" = "Darwin" ]; then
     add_brew_tap symfony-cli/homebrew-tap
-    brew install symfony-cli/tap/symfony-cli >/dev/null 2>&1
+    brew install symfony-cli/tap/symfony-cli 
   fi
   symfony_path="$(command -v symfony)"
   if [[ -n "$symfony_path" ]]; then

@@ -52,7 +52,7 @@ enable_extensions() {
   local extensions=("$@")
   to_wait=()
   for ext in "${extensions[@]}"; do
-    enable_extension "$ext" extension >/dev/null 2>&1 &
+    enable_extension "$ext" extension  &
     to_wait+=($!)
   done
   wait "${to_wait[@]}"
@@ -106,7 +106,7 @@ disable_extension() {
 disable_all_shared() {
   get_extension_map
   sudo sed -i.orig -E -e "/^(zend_)?extension\s*=/d" "${ini_file[@]}" "$pecl_file" 2>/dev/null || true
-  sudo find "${ini_dir:-$scan_dir}"/.. -name "*.ini" -not -path "*php.ini" -not -path "*phar.ini" -not -path "*pecl.ini" -not -path "*mods-available*" -delete >/dev/null 2>&1 || true
+  sudo find "${ini_dir:-$scan_dir}"/.. -name "*.ini" -not -path "*php.ini" -not -path "*phar.ini" -not -path "*pecl.ini" -not -path "*mods-available*" -delete  || true
   mkdir -p /tmp/extdisabled/"$version"
   sudo find "$ext_dir" -name '*.so' -print0 | xargs -0 -n 1 basename -s .so | xargs -n 1 -I{} touch /tmp/extdisabled/"$version"/{}
   add_log "${tick:?}" "none" "Disabled all shared extensions"
@@ -119,7 +119,7 @@ configure_pecl() {
       sudo "$script" config-set php_ini "${pecl_file:-${ini_file[@]}}"
       sudo "$script" channel-update "$script".php.net
     done
-    echo '' | sudo tee /tmp/pecl_config >/dev/null 2>&1
+    echo '' | sudo tee /tmp/pecl_config 
   fi
 }
 
@@ -151,8 +151,8 @@ get_pecl_version() {
 # Function to install PECL extensions and accept default options
 pecl_install() {
   local extension=$1
-  add_pecl >/dev/null 2>&1
-  yes '' 2>/dev/null | sudo pecl install -f "$extension" >/dev/null 2>&1
+  add_pecl 
+  yes '' 2>/dev/null | sudo pecl install -f "$extension" 
 }
 
 # Function to install a specific version of PECL extension.
@@ -168,7 +168,7 @@ add_pecl_extension() {
   if [ "${ext_version/-/}" = "$pecl_version" ]; then
     add_log "${tick:?}" "$extension" "Enabled"
   else
-    disable_extension_helper "$extension" >/dev/null 2>&1
+    disable_extension_helper "$extension" 
     pecl_install "$extension-$pecl_version"
     add_extension_log "$extension-$pecl_version" "Installed and enabled"
   fi

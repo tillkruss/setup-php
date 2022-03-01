@@ -92,7 +92,7 @@ add_tools_helper() {
     sudo ln -s "$tool_path" "$tool_path_dir"/"${tool%-*}"
   fi
   for extension in "${extensions[@]}"; do
-    add_extension "$extension" extension >/dev/null 2>&1
+    add_extension "$extension" extension 
   done
 }
 
@@ -135,15 +135,15 @@ add_composertool_helper() {
   composer_args=$5
   enable_extensions curl mbstring openssl
   if [ "$scope" = "global" ]; then
-    sudo rm -f "$composer_lock" >/dev/null 2>&1 || true
-    composer global require "$prefix$release" "$composer_args" >/dev/null 2>&1
-    composer global show "$prefix$tool" 2>&1 | grep -E ^versions | sudo tee /tmp/composer.log >/dev/null 2>&1
+    sudo rm -f "$composer_lock"  || true
+    composer global require "$prefix$release" "$composer_args" 
+    composer global show "$prefix$tool" 2>&1 | grep -E ^versions | sudo tee /tmp/composer.log 
   else
     scoped_dir="$composer_bin/_tools/$tool-$(echo -n "$release" | shasum -a 256 | cut -d ' ' -f 1)"
     if ! [ -d "$scoped_dir" ]; then
       mkdir -p "$scoped_dir"
-      composer require "$prefix$release" -d "$scoped_dir" "$composer_args" >/dev/null 2>&1
-      composer show "$prefix$tool" -d "$scoped_dir" 2>&1 | grep -E ^versions | sudo tee /tmp/composer.log >/dev/null 2>&1
+      composer require "$prefix$release" -d "$scoped_dir" "$composer_args" 
+      composer show "$prefix$tool" -d "$scoped_dir" 2>&1 | grep -E ^versions | sudo tee /tmp/composer.log 
     fi
     add_path "$scoped_dir"/vendor/bin
   fi
