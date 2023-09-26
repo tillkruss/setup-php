@@ -43,7 +43,9 @@ copy_brew_extensions() {
     extension_file="${brew_prefix:?}/opt/$dependency/$(get_extension_from_formula "${dependency%@*}").so"
     [ -e "$extension_file" ] && sudo cp "$extension_file" "$ext_dir"
   done
-  sudo find -- "$brew_prefix"/Cellar/"$formula"@"$version" -name "*.dylib" -exec cp {} "$ext_dir" \;
+  if [ -d "$brew_prefix"/Cellar/"$formula"@"$version" ]; then
+    sudo find -- "$brew_prefix"/Cellar/"$formula"@"$version" -name "*.dylib" -exec cp {} "$ext_dir" \;
+  fi
 }
 
 # Function to install a php extension from shivammathur/extensions tap.
@@ -162,8 +164,11 @@ fix_dependencies() {
 
 # Function to get PHP version if it is already installed using Homebrew.
 get_brewed_php() {
-  php_cellar="$brew_prefix"/Cellar/php
-  if [ -d "$php_cellar" ] && ! [[ "$(find "$php_cellar" -maxdepth 1 -name "$version*" | wc -l 2>/dev/null)" -eq 0 ]]; then
+  cellar="$brew_prefix"/Cellar
+  php_cellar="$cellar"/php
+  if [ -d "$cellar" ] && ! [[ "$(find "$cellar" -maxdepth 1 -name "php@$version*" | wc -l 2>/dev/null)" -eq 0 ]]; then
+    php_semver | cut -c 1-3
+  elif [ -d "$php_cellar" ] && ! [[ "$(find "$php_cellar" -maxdepth 1 -name "$version*" | wc -l 2>/dev/null)" -eq 0 ]]; then
     php_semver | cut -c 1-3
   else
     echo 'false';
