@@ -32,6 +32,8 @@ get_couchbase_version() {
     echo couchbase-3.0.4
   elif [ "${version:?}" = '7.3' ]; then
     echo couchbase-3.2.2
+  elif [ "${version:?}" = '7.4' ]; then
+    echo couchbase-4.1.0
   else
     echo couchbase
   fi
@@ -55,6 +57,9 @@ add_couchbase() {
     else
       if [ "$ext" = "couchbase" ]; then
         ext="couchbase-$(get_pecl_version "couchbase" "stable")"
+        n_proc="$(nproc)"
+        export COUCHBASE_SUFFIX_OPTS="CMAKE_BUILD_TYPE=Release"
+        export CMAKE_BUILD_PARALLEL_LEVEL="$n_proc"
         add_extension_from_source couchbase https://pecl.php.net couchbase couchbase "${ext##*-}" extension pecl >/dev/null 2>&1
       else
         pecl_install "${ext}" >/dev/null 2>&1

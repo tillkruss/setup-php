@@ -126,7 +126,8 @@ patch_brew() {
 # Helper function to update the dependencies.
 update_dependencies_helper() {
   dependency=$1
-  get -q -n "$core_repo/Formula/$dependency.rb" "https://raw.githubusercontent.com/Homebrew/homebrew-core/master/Formula/$dependency.rb"
+  [[ "${dependency:0:3}" = "lib" ]] && prefix=lib || prefix="${dependency:0:1}"
+  get -q -n "$core_repo/Formula/$prefix/$dependency.rb" "https://raw.githubusercontent.com/Homebrew/homebrew-core/master/Formula/$prefix/$dependency.rb"
   link_libraries "$dependency"
 }
 
@@ -271,6 +272,7 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
+export HOMEBREW_NO_INSTALL_FROM_API=1
 
 # shellcheck source=.
 . "${scripts:?}"/unix.sh
