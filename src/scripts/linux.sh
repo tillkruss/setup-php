@@ -109,6 +109,11 @@ setup_old_versions() {
   run_script "php5-ubuntu" "$version"
 }
 
+# Function to setup PHP from the cached builds.
+setup_cached_versions() {
+  run_script "php-ubuntu" "$version" "${debug:?}" "${ts:?}"
+}
+
 # Function to add PECL.
 add_pecl() {
   add_devtools phpize >/dev/null 2>&1
@@ -149,13 +154,9 @@ get_php_packages() {
 
 # Function to install packaged PHP
 add_packaged_php() {
-  if [ "$runner" = "self-hosted" ] || [ "${use_package_cache:-true}" = "false" ]; then
-    add_ppa ondrej/php >/dev/null 2>&1 || update_ppa ondrej/php
-    IFS=' ' read -r -a packages <<<"$(get_php_packages)"
-    install_packages "${packages[@]}"
-  else
-    run_script "php-ubuntu" "$version" "${debug:?}"
-  fi
+  add_ppa ondrej/php >/dev/null 2>&1 || update_ppa ondrej/php
+  IFS=' ' read -r -a packages <<<"$(get_php_packages)"
+  install_packages "${packages[@]}"
 }
 
 # Function to update PHP.
@@ -172,14 +173,18 @@ update_php() {
 
 # Function to install PHP.
 add_php() {
-  if [[ "$version" =~ ${nightly_versions:?} ]] || [[ "${ts:?}" = "zts" ]]; then
-    setup_nightly
+  if [ "${runner:?}" = "self-hosted" ] || [ "${use_package_cache:-true}" = "false" ]; then
+    if [[ "$version" =~ ${nightly_versions:?} ]]; then
+        setup_nightly
+    else
+      add_packaged_php
+      switch_version >/dev/null 2>&1
+      add_pecl
+    fi
   elif [[ "$version" =~ ${old_versions:?} ]]; then
     setup_old_versions
   else
-    add_packaged_php
-    switch_version >/dev/null 2>&1
-    add_pecl
+    setup_cached_versions
   fi
   status="Installed"
 }
@@ -272,7 +277,7 @@ setup_php() {
 }
 
 # Variables
-version=${1:-'8.2'}
+version=${1:-'8.3'}
 ini=${2:-'production'}
 src=${0%/*}/..
 debconf_fix="DEBIAN_FRONTEND=noninteractive"
