@@ -116,7 +116,7 @@ On all supported OS/Platforms the following PHP versions can be set up as per th
 | `8.0`       | `Stable`  | `End of life`         | `GitHub-hosted`, `self-hosted` |
 | `8.1`       | `Stable`  | `Security fixes only` | `GitHub-hosted`, `self-hosted` |
 | `8.2`       | `Stable`  | `Active`              | `GitHub-hosted`, `self-hosted` |
-| `8.3`       | `Nightly` | `In development`      | `GitHub-hosted`, `self-hosted` |
+| `8.3`       | `Stable` | `Active`              | `GitHub-hosted`, `self-hosted` |
 | `8.4`       | `Nightly` | `In development`      | `GitHub-hosted`, `self-hosted` |
 
 **Notes:**
@@ -222,7 +222,7 @@ PHP extensions can be set up using the `extensions` input. It accepts a `string`
 
 These tools can be set up globally using the `tools` input. It accepts a string in csv-format.
 
-[`behat`], [`blackfire`], [`blackfire-player`], [`castor`], [`churn`], [`codeception`], [`composer`], [`composer-normalize`], [`composer-prefetcher`], [`composer-require-checker`], [`composer-unused`], [`cs2pr`], [`deployer`], [`flex`], [`grpc_php_plugin`], [`infection`], [`parallel-lint`], [`pecl`], [`phan`], [`phing`], [`phinx`], [`phive`], [`php-config`], [`php-cs-fixer`], [`phpcbf`], [`phpcpd`], [`phpcs`], [`phpdoc`] or [`phpDocumentor`], [`phpize`], [`phplint`], [`phpmd`], [`phpspec`], [`phpstan`], [`phpunit`], [`phpunit-bridge`], [`phpunit-polyfills`], [`pint`], [`prestissimo`], [`protoc`], [`psalm`], [`rector`], [`symfony`] or [`symfony-cli`], [`vapor`] or [`vapor-cli`], [`wp`] or [`wp-cli`]
+[`behat`], [`blackfire`], [`blackfire-player`], [`box`], [`castor`], [`churn`], [`codeception`], [`composer`], [`composer-normalize`], [`composer-prefetcher`], [`composer-require-checker`], [`composer-unused`], [`cs2pr`], [`deployer`], [`flex`], [`grpc_php_plugin`], [`infection`], [`parallel-lint`], [`pecl`], [`phan`], [`phing`], [`phinx`], [`phive`], [`php-config`], [`php-cs-fixer`], [`php-scoper`], [`phpcbf`], [`phpcpd`], [`phpcs`], [`phpdoc`] or [`phpDocumentor`], [`phpize`], [`phplint`], [`phpmd`], [`phpspec`], [`phpstan`], [`phpunit`], [`phpunit-bridge`], [`phpunit-polyfills`], [`pint`], [`prestissimo`], [`protoc`], [`psalm`], [`rector`], [`symfony`] or [`symfony-cli`], [`vapor`] or [`vapor-cli`], [`wp`] or [`wp-cli`]
 
 ```yaml
 - name: Setup PHP with tools
@@ -392,10 +392,14 @@ Disable coverage for these reasons:
 - Specify the PHP version you want to set up.
 - Accepts a `string`. For example `'8.0'`.
 - Accepts `latest` to set up the latest stable PHP version.
+- Accepts `lowest` to set up the lowest supported PHP version.
 - Accepts `nightly` to set up a nightly build from the master branch of PHP.
 - Accepts the format `d.x`, where `d` is the major version. For example `5.x`, `7.x` and `8.x`.  
 - See [PHP support](#tada-php-support) for the supported PHP versions.
-- If not specified, it looks for `php-version-file` input.
+- If not specified, it looks for the following in order:
+  - The `php-version-file` input if it exists
+  - A `composer.lock` file and the `platform-overrides.php` value
+  - A `composer.json` file and the `config.platform.php` value
 
 #### `php-version-file` (optional)
 
@@ -1027,6 +1031,7 @@ These companies generously provide setup-php their products and services to aid 
 [`behat`]:                    https://docs.behat.org/en/latest/
 [`blackfire`]:                https://blackfire.io/docs/php/index
 [`blackfire-player`]:         https://blackfire.io/docs/builds-cookbooks/player
+[`box`]:                      https://github.com/humbug/box
 [`castor`]:                   https://github.com/jolicode/castor
 [`churn`]:                    https://github.com/bmitch/churn-php
 [`codeception`]:              https://codeception.com/
@@ -1048,6 +1053,7 @@ These companies generously provide setup-php their products and services to aid 
 [`phive`]:                    https://phar.io/
 [`php-config`]:               https://www.php.net/manual/en/install.pecl.php-config.php
 [`php-cs-fixer`]:             https://cs.symfony.com/
+[`php-scoper`]:               https://github.com/humbug/php-scoper
 [`phpcbf`]:                   https://github.com/PHPCSStandards/php_codesniffer
 [`phpcpd`]:                   https://github.com/sebastianbergmann/phpcpd
 [`phpcs`]:                    https://github.com/PHPCSStandards/php_codesniffer
