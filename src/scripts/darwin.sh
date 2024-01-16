@@ -1,11 +1,21 @@
-# Disable dependency extensions
-disable_dependency_extensions() {
-  local extension=$1
+# Handle dependency extensions
+handle_dependency_extensions() {
+  local formula=$1
+  local extension=$2
   formula_file="${tap_dir:?}/$ext_tap/Formula/$extension@${version:?}.rb"
+  [ -e "$formula_file" ] || formula_file="$tap_dir/$ext_tap/Formula/$formula@$version.rb"
   if [ -e "$formula_file" ]; then
     IFS=" " read -r -a dependency_extensions <<< "$(grep -Eo "shivammathur.*@" "$formula_file" | xargs -I {} -n 1 basename '{}' | cut -d '@' -f 1 | tr '\n' ' ')"
     for dependency_extension in "${dependency_extensions[@]}"; do
       sudo sed -Ei '' "/=(.*\/)?\"?$dependency_extension(.so)?$/d" "${ini_file:?}"
+    done
+  fi
+  suffix="$(get_php_formula_suffix)"
+  if [[ -n "$suffix" ]]; then
+    brew_opts=(-sf)
+    patch_abstract_file >/dev/null 2>&1
+    for dependency_extension in "${dependency_extensions[@]}"; do
+        brew install "${brew_opts[@]}" "$ext_tap/$dependency_extension@$version" >/dev/null 2>&1 && copy_brew_extensions "$dependency_extension"
     done
   fi
 }
@@ -61,10 +71,19 @@ add_brew_extension() {
     add_brew_tap "$ext_tap"
     sudo mv "$tap_dir"/"$ext_tap"/.github/deps/"$formula"/* "${core_repo:?}/Formula/" 2>/dev/null || true
     update_dependencies >/dev/null 2>&1
-    disable_dependency_extensions "$extension" >/dev/null 2>&1
-    (brew install -f "$ext_tap/$formula@$version" >/dev/null 2>&1 && copy_brew_extensions "$formula") || pecl_install "$extension" >/dev/null 2>&1
+    handle_dependency_extensions "$formula" "$extension" >/dev/null 2>&1
+    (brew install "${brew_opts[@]}" "$ext_tap/$formula@$version" >/dev/null 2>&1 && copy_brew_extensions "$formula") || pecl_install "$extension" >/dev/null 2>&1
     add_extension_log "$extension" "Installed and enabled"
   fi
+}
+
+# Function to patch the abstract file in the extensions tap.
+patch_abstract_file() {
+    abstract_path="$tap_dir"/"$ext_tap"/Abstract/abstract-php-extension.rb
+    if [[ -e "$abstract_path" && ! -e /tmp/abstract_patch ]]; then
+        echo '' | sudo tee /tmp/abstract_patch >/dev/null 2>&1
+        sudo sed -i '' -e "s|php@#{\(.*\)}|php@#{\1}$suffix|g" -e "s|php_version /|\"#{php_version}$suffix\" /|g" "$abstract_path"
+    fi
 }
 
 # Helper function to add an extension.
@@ -181,13 +200,22 @@ add_php() {
   existing_version=$2
   add_brew_tap "$php_tap"
   update_dependencies
-  [ "${debug:?}" = "debug" ] && php_formula="$php_formula-debug"
-  if [ "$existing_version" != "false" ]; then
+  suffix="$(get_php_formula_suffix)"
+  php_formula="shivammathur/php/php@$version$suffix"
+  if [[ "$existing_version" != "false" && -z "$suffix" ]]; then
     ([ "$action" = "upgrade" ] && brew upgrade -f "$php_formula") || brew unlink "$php_formula"
   else
     brew install -f "$php_formula"
   fi
   brew link --force --overwrite "$php_formula"
+}
+
+# Function to get formula suffix
+get_php_formula_suffix() {
+  local suffix
+  [ "${debug:?}" = "debug" ] && suffix="-debug"
+  [ "${ts:?}" = "zts" ] && suffix="$suffix-zts"
+  echo "$suffix"
 }
 
 # Function to get extra version.

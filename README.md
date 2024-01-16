@@ -390,9 +390,9 @@ Disable coverage for these reasons:
 #### `php-version` (optional)
 
 - Specify the PHP version you want to set up.
-- Accepts a `string`. For example `'8.0'`.
-- Accepts `latest` to set up the latest stable PHP version.
+- Accepts a `string`. For example `'8.3'`.
 - Accepts `lowest` to set up the lowest supported PHP version.
+- Accepts `highest` or `latest` to set up the latest stable PHP version.
 - Accepts `nightly` to set up a nightly build from the master branch of PHP.
 - Accepts the format `d.x`, where `d` is the major version. For example `5.x`, `7.x` and `8.x`.  
 - See [PHP support](#tada-php-support) for the supported PHP versions.
@@ -473,7 +473,7 @@ On GitHub Actions you can assign the `setup-php` step an `id`, you can use the s
 
 #### `phpts` (optional)
 
-- Specify to set up a thread-safe build of PHP on Linux and Windows.
+- Specify to set up a thread-safe build of PHP.
 - Accepts `nts` for non-thread-safe and `zts` or `ts` for thread-safe.
 - By default, it is set to `nts`.
 - See [thread safe setup](#thread-safe-setup) for more info.
@@ -571,16 +571,14 @@ steps:
 
 ### Thread Safe Setup
 
-> Set up `TS` or `NTS` PHP on `Linux` and `Windows`.
+> Set up `TS` or `NTS` PHP.
 
 - `NTS` versions are set up by default.
-- On `macOS` only `NTS` versions are supported currently.
-- On `Linux` and `Windows` both `TS` and `NTS` versions are supported.
 
 ```yaml
 jobs:
   run:
-    runs-on: [ubuntu-latest, windows-latest]
+    runs-on: [ubuntu-latest, windows-latest, macos-latest]
     name: Setup PHP TS
     steps:
     - name: Setup PHP
@@ -945,7 +943,7 @@ Examples of using `setup-php` with various PHP frameworks and packages.
 - A new major version of the action will only be tagged when there are breaking changes in the setup-php API i.e. inputs, outputs, and environment flags.
 - For debugging any issues `verbose` tag can be used temporarily. It outputs all the logs and is also synced with the latest releases.
 - It is highly discouraged to use the `main` branch as version, it might break your workflow after major releases as they have breaking changes.
-- If you are using the `v1` tag or a `1.x.y` version, you should [switch to v2](https://github.com/shivammathur/setup-php/wiki/Switch-to-v2 "Guide for switching from setup-php v1 to v2") as `v1` only gets critical bug fixes. Maintenance support for `v1` will be dropped with the last `PHP 8.0` release.
+- If you are using the `v1` tag or a `1.x.y` version, you should [switch to v2](https://github.com/shivammathur/setup-php/wiki/Switch-to-v2 "Guide for switching from setup-php v1 to v2") as `v1` is not supported anymore.
 
 ## :scroll: License
 
