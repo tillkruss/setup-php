@@ -307,6 +307,16 @@ These tools can be set up globally using the `tools` input. It accepts a string 
 - If you do not want to use all your dev-dependencies in workflow, you can run composer with `--no-dev` and install required tools using `tools` input to speed up your workflow.
 - By default, `COMPOSER_NO_INTERACTION` is set to `1` and `COMPOSER_PROCESS_TIMEOUT` is set to `0`. In effect, this means that Composer commands in your scripts do not need to specify `--no-interaction`.
 - Also, `COMPOSER_NO_AUDIT` is set to `1`. So if you want to audit your dependencies for security vulnerabilities, it is recommended to add a `composer audit` step before you install them.
+- If you want to set a different `COMPOSER_PROCESS_TIMEOUT`, you can set it in your workflow file using the `env` keyword.
+
+```yaml
+- name: Setup PHP with composer and custom process timeout
+  uses: shivammathur/setup-php@v2
+  with:
+    php-version: '8.3'
+  env:
+    COMPOSER_PROCESS_TIMEOUT: 300
+```
 
 ## :signal_strength: Coverage Support
 
@@ -559,6 +569,11 @@ steps:
 - Production release builds of PHP without debugging symbols are set up by default.
 - You can use the `debug` environment variable to set up a build with debugging symbols for PHP 5.6 and above.
 
+**Notes**
+- On Linux, the debug symbols are added as [debug info files](https://sourceware.org/gdb/current/onlinedocs/gdb.html/Separate-Debug-Files.html) in the `/usr/lib/debug/.build-id` directory. These files match the `build-id` in the ELF section of the PHP binaries and debugging tools like `gdb` are able to resolve the symbols from these files.
+- On Windows, the debug symbols are added as `pdb` files in the PHP installation directory.
+- On macOS, the debug symbols are compiled into the binaries.
+
 ```yaml
 steps:
 - name: Setup PHP with debugging symbols
@@ -742,7 +757,7 @@ If your project uses composer, you can persist the composer's internal cache dir
   run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
 - name: Cache dependencies
-  uses: actions/cache@v3
+  uses: actions/cache@v4
   with:
     path: ${{ steps.composer-cache.outputs.dir }}
     key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -979,25 +994,18 @@ These companies generously provide setup-php their products and services to aid 
 
 <p>
   <a href="https://www.jetbrains.com/?from=setup-php">
-    <img src="https://setup-php.com/sponsors/jetbrains.svg" alt="JetBrains" width="106" height="60">
+    <img src="https://setup-php.com/sponsors/jetbrains.svg" alt="JetBrains" width="212" height="120">
   </a>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://www.macstadium.com/opensource/members#gh-light-mode-only">
-    <img src="https://setup-php.com/sponsors/macstadium.png" alt="Mac Stadium" width="148" height="60">
+    <img src="https://setup-php.com/sponsors/macstadium.png" alt="Mac Stadium" width="296" height="120">
   </a>
   <a href="https://www.macstadium.com/opensource/members#gh-dark-mode-only">
-    <img src="https://setup-php.com/sponsors/macstadium-white.png" alt="Mac Stadium" width="148" height="60">
+    <img src="https://setup-php.com/sponsors/macstadium-white.png" alt="Mac Stadium" width="296" height="120">
   </a>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://tidelift.com/subscription/pkg/npm-setup-php">
-    <img src="https://setup-php.com/sponsors/tidelift.png" alt="Tidelift" width="70" height="60">
-  </a>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <a href="https://www.scaleway.com/en/about-us/open-source-program#gh-light-mode-only">
-    <img src="https://setup-php.com/sponsors/scaleway.png" alt="Scaleway" width="174" height="60">
-  </a>
-  <a href="https://www.scaleway.com/en/about-us/open-source-program#gh-dark-mode-only">
-    <img src="https://setup-php.com/sponsors/scaleway-white.png" alt="Scaleway" width="174" height="60">
+    <img src="https://setup-php.com/sponsors/tidelift.png" alt="Tidelift" width="140" height="120">
   </a>
 </p>
 
