@@ -318,5 +318,11 @@
     "extension": ".phar",
     "version_parameter": "--version",
     "version_prefix": "v"
+  },
+  "easy-coding-standard": {
+    "type": "composer",
+    "alias": "ecs",
+    "repository": "symplify/easy-coding-standard",
+    "scope": "scoped"
   }
 }
