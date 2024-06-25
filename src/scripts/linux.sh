@@ -6,6 +6,14 @@ add_sudo() {
   fi
 }
 
+# Function to link apt-fast to apt-get
+link_apt_fast() {
+  if ! command -v apt-fast >/dev/null; then
+    sudo ln -sf /usr/bin/apt-get /usr/bin/apt-fast
+    trap "sudo rm -f /usr/bin/apt-fast 2>/dev/null" exit
+  fi
+}
+
 # Function to setup environment for self-hosted runners.
 self_hosted_helper() {
   if ! command -v apt-fast >/dev/null; then
@@ -23,6 +31,10 @@ fix_broken_packages() {
 # Function to install a package
 install_packages() {
   packages=("$@")
+  if ! [ -e /etc/dpkg/dpkg.cfg.d/force-confnew ]; then
+    echo "force-confnew" | sudo tee /etc/dpkg/dpkg.cfg.d/force-confnew >/dev/null 2>&1
+    trap "sudo rm -f /etc/dpkg/dpkg.cfg.d/force-confnew 2>/dev/null" exit
+  fi
   $apt_install "${packages[@]}" >/dev/null 2>&1 || (update_lists && fix_broken_packages && $apt_install "${packages[@]}" >/dev/null 2>&1)
 }
 
@@ -285,6 +297,7 @@ apt_install="sudo $debconf_fix apt-fast install -y --no-install-recommends"
 scripts="$src"/scripts
 
 add_sudo >/dev/null 2>&1
+link_apt_fast >/dev/null 2>&1
 
 . /etc/os-release
 # shellcheck source=.
