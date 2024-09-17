@@ -75,9 +75,8 @@ Both `GitHub-hosted` and `self-hosted` runners are supported by `setup-php` on t
 | Ubuntu 20.04        | `ubuntu-20.04`                     | `PHP 7.4` to `PHP 8.3` |
 | Windows Server 2022 | `windows-latest` or `windows-2022` | `PHP 8.3`              |
 | Windows Server 2019 | `windows-2019`                     | `PHP 8.3`              |
-| macOS Sonoma 14.x   | `macos-14`                         | -                      |
+| macOS Sonoma 14.x   | `macos-latest` or `macos-14`       | -                      |
 | macOS Ventura 13.x  | `macos-13`                         | `PHP 8.3`              |
-| macOS Monterey 12.x | `macos-latest` or `macos-12`       | `PHP 8.3`              |
 
 ### Self-Hosted Runners
 
@@ -90,9 +89,9 @@ Both `GitHub-hosted` and `self-hosted` runners are supported by `setup-php` on t
 | Debian 11                        | `self-hosted` or `Linux`   |
 | Windows 7 and newer              | `self-hosted` or `Windows` |
 | Windows Server 2012 R2 and newer | `self-hosted` or `Windows` |
+| macOS Sequoia 15.x x86_64/arm64  | `self-hosted` or `macOS`   |
 | macOS Sonoma 14.x x86_64/arm64   | `self-hosted` or `macOS`   |
 | macOS Ventura 13.x x86_64/arm64  | `self-hosted` or `macOS`   |
-| macOS Monterey 12.x x86_64/arm64 | `self-hosted` or `macOS`   |
 
 - Refer to the [self-hosted setup](#self-hosted-setup) to use the action on self-hosted runners.
 - Operating systems based on the above Ubuntu and Debian versions are also supported on best effort basis.
@@ -226,7 +225,7 @@ PHP extensions can be set up using the `extensions` input. It accepts a `string`
 
 These tools can be set up globally using the `tools` input. It accepts a string in csv-format.
 
-[`behat`], [`blackfire`], [`blackfire-player`], [`box`], [`castor`], [`churn`], [`codeception`], [`composer`], [`composer-normalize`], [`composer-prefetcher`], [`composer-require-checker`], [`composer-unused`], [`cs2pr`], [`deployer`], [`ecs`], [`flex`], [`grpc_php_plugin`], [`infection`], [`parallel-lint`], [`pecl`], [`phan`], [`phing`], [`phinx`], [`phive`], [`php-config`], [`php-cs-fixer`], [`php-scoper`], [`phpcbf`], [`phpcpd`], [`phpcs`], [`phpdoc`] or [`phpDocumentor`], [`phpize`], [`phplint`], [`phpmd`], [`phpspec`], [`phpstan`], [`phpunit`], [`phpunit-bridge`], [`phpunit-polyfills`], [`pint`], [`prestissimo`], [`protoc`], [`psalm`], [`rector`], [`symfony`] or [`symfony-cli`], [`vapor`] or [`vapor-cli`], [`wp`] or [`wp-cli`]
+[`behat`], [`blackfire`], [`blackfire-player`], [`box`], [`castor`], [`churn`], [`codeception`], [`composer`], [`composer-dependency-analyser`], [`composer-normalize`], [`composer-prefetcher`], [`composer-require-checker`], [`composer-unused`], [`cs2pr`], [`deployer`], [`ecs`], [`flex`], [`grpc_php_plugin`], [`infection`], [`parallel-lint`], [`pecl`], [`phan`], [`phing`], [`phinx`], [`phive`], [`php-config`], [`php-cs-fixer`], [`php-scoper`], [`phpcbf`], [`phpcpd`], [`phpcs`], [`phpdoc`] or [`phpDocumentor`], [`phpize`], [`phplint`], [`phpmd`], [`phpspec`], [`phpstan`], [`phpunit`], [`phpunit-bridge`], [`phpunit-polyfills`], [`pint`], [`prestissimo`], [`protoc`], [`psalm`], [`rector`], [`symfony`] or [`symfony-cli`], [`vapor`] or [`vapor-cli`], [`wp`] or [`wp-cli`]
 
 ```yaml
 - name: Setup PHP with tools
@@ -1049,6 +1048,7 @@ These companies generously provide setup-php their products and services to aid 
 [`churn`]:                    https://github.com/bmitch/churn-php
 [`codeception`]:              https://codeception.com/
 [`composer`]:                 https://getcomposer.org/
+[`composer-dependency-analyser`]: https://github.com/shipmonk-rnd/composer-dependency-analyser
 [`composer-normalize`]:       https://github.com/ergebnis/composer-normalize
 [`composer-prefetcher`]:      https://github.com/narrowspark/automatic-composer-prefetcher
 [`composer-require-checker`]: https://github.com/maglnet/ComposerRequireChecker
